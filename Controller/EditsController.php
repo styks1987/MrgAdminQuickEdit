@@ -37,7 +37,7 @@
 		}
 
 		function delete($id){
-			$data = $this->request->data;
+			$data = json_decode(file_get_contents('php://input'), TRUE);
 			$model = $data['model'];
 			App::import('Model', $model);
 			$this->model = new $model;
@@ -48,6 +48,22 @@
 				$message = 0;
 			}
 			echo json_encode($message);
+			exit;
+		}
+		/**
+		 * add a related field item
+		 *
+		 * This assumes pk is ID and didsplayfield is name
+		 *
+		 * Date Added: Thu, Jun 26, 2014
+		 */
+
+		function add_related(){
+			App::import('Model', $this->request->data['model']);
+			$this->model = new $this->request->data['model']();
+			$this->model->create();
+			$this->model->save(['name'=>$this->request->data['name']]);
+			echo json_encode(['id'=>$this->model->id, 'name'=>$this->request->data['name']]);
 			exit;
 		}
 

@@ -15,6 +15,7 @@
 			$this->_set_fields($fields);
 			$this->_set_data($data);
 			$this->_set_options();
+			$this->_get_field_defaults();
 
 			echo $this->Html->div('', '', ['id'=>'edit_region']);
 
@@ -26,7 +27,8 @@
 				"var options = ".json_encode($this->options).";\n".
 				"var edit_list = ".json_encode($this->data).";".
 				"var urlRoot = '".$url_root."';".
-				"var model_name = '".$this->model->name."';"
+				"var model_name = '".$this->model->name."';".
+				"var model_defaults = ".json_encode($this->defaults).";"
 			);
 
 			// This has to be loaded last
@@ -48,9 +50,11 @@
 		private function _set_data($data){
 			$this->data = [];
 			foreach($data as $item){
-				if(!empty($item['Image'])){
-					$item[$this->model->name]['Image'] = $item['Image'];
+				foreach($this->model->getAssociated() as $assoc=>$type){
+					if(!empty($item[$assoc]));
+					$item[$this->model->name][$assoc] = $item[$assoc];
 				}
+
 				$this->data[] = $item[$this->model->name];
 			}
 		}
@@ -59,6 +63,18 @@
 			$this->options['fields'] = $this->fields;
 
 		}
+
+		private function _get_field_defaults(){
+			//{ id:null, NewsCategory:{id:1},    title:"The first title",published:0,, model:model_name, news_category_id:1, published_date : null};
+			//{"id":null,"NewsCategory":{"id":1},"title":null,"author":null,"published":null,"published_date":null,"news_category_id":1,"model":"News"}
+			$this->defaults = [];
+			foreach($this->fields as $field){
+				$this->defaults[$field] = null;
+			}
+
+			$this->defaults['model'] = $this->model->name;
+		}
+
 
 		/**
 		 * create the template for a single item
@@ -145,6 +161,9 @@
 				case 'boolean':
 					$input = $this->_input_boolean($field_name);
 					break;
+				case null:
+					$input = $this->_input_related($field_name);
+					break;
 				default :
 					$input = '<%= '.$field_name.' %>';
 					break;
@@ -155,6 +174,28 @@
 
 		private function _input_boolean($field_name){
 			return '<input type="checkbox" name="'.$field_name.'" <% if('.$field_name.' == 1){%>checked="checked"<%}%> />';
+		}
+
+		private function _input_related($field_name){
+			App::import('Model', $field_name);
+			$this->related_model = new $field_name();
+
+			$list = $this->related_model->find('list');
+			$input = "<div class='row' style='min-width:200px'>";
+			$input .= "<div class='col-sm-9' style='padding-right:0;'>";
+				$input .= "<select style='width:100%;' data-field='".Inflector::underscore($field_name)."_id' name='".Inflector::underscore($field_name)."_id'>";
+				$input .= "<option value=0>-- Choose an Option --</option>";
+				foreach($list as $id => $value){
+					$input .= "<option
+								<% if(".$this->related_model->name." && ".$this->related_model->name.".".$this->related_model->primaryKey." == ".$id."){%> selected='selected' <%}%>
+								value='".$id."'>".$value."</option>";
+				}
+				$input .= "</select>";
+			$input .= "</div><div class='col-sm-1'>";
+				$input .= "<a href='javascript:void(0)' class='glyphicon glyphicon-plus add_related' data-field='".Inflector::underscore($field_name)."_id' data-model='".$field_name."'></a>";
+			$input .= "</div>";
+
+			return $input;
 		}
 
 	}

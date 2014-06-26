@@ -22,9 +22,12 @@ Edit.View = Backbone.View.extend({
 	tagName : 'tr',
 	events : {
 		'change input[type="checkbox"]' : '_update_checkbox',
+		'change select' : '_update_select',
 		'keyup [contentEditable=true]' : '_update_default',
+		'keydown [contentEditable=true]' : '_check_pressed_key',
 		'click .delete' : '_delete',
 		'click .attachment' : '_toggle_attachment_view',
+		'click .add_related' : '_add_related_field'
 	},
 	template : _.template($('#EditViewTemplate').html()),
 	render : function () {
@@ -50,6 +53,47 @@ Edit.View = Backbone.View.extend({
 
 		editViewUpload.render();
 	},
+	_add_related_field : function (e) {
+		data = $(e.target).data();
+		input = $("<input name='"+data.model+"' />");
+		$(e.target).closest('td').html(input);
+
+		$(input).blur(function (e) {
+			this._create_related(data.model,data.field, $(e.target).val());
+		}.bind(this));
+	},
+
+	_create_related : function (model, field, value){
+		name = value;
+
+		$.ajax({
+			url:'/mrg_admin_quick_edit/edits/add_related',
+			data:{name:value,model:model},
+			type:'post',
+			dataType:'json',
+			complete : function (response) {
+				response = response.responseJSON;
+				related = this.model.get(model);
+				related.id = response.id;
+				related.name = response.name;
+				this.model.set(model, related);
+				this.model.set(field, response.id);
+
+				selects = 'select[name="'+field+'"]';
+				this.$el.html(this.template(this.model.attributes));
+					option = $('<option value='+response.id+'>'+response.name+'</option>');
+					$(selects).append(option);
+					this.$el.find('option[value='+response.id+']').attr('selected', 'selected');
+					this._update();
+			}.bind(this)
+		}).send();
+
+
+
+
+
+
+	},
 	_update_image : function(file,response){
 		this.model.set('Image', {thumb:response.file_url});
 
@@ -68,6 +112,12 @@ Edit.View = Backbone.View.extend({
 		this.model.set(field, value);
 		this._update();
 	},
+	_update_select : function (e){
+		field = jQuery(e.target).data('field');
+		value = jQuery(e.target).val();
+		this.model.set(field, value);
+		this._update();
+	},
 	_update : function () {
 		saving_model = {};
 		if (typeof saving_model[this.model.get('id')] != 'undefined') {
@@ -77,18 +127,27 @@ Edit.View = Backbone.View.extend({
 		saving_model[this.model.get('id')] = setTimeout(_.bind(this.model.save, this.model), 700);
 	},
 	_delete : function (e) {
+		console.log('delete');
 		if (confirm("Are you sure you want to delete "+this.model.get('title')+"? This cannot be undone.")) {
 			jQuery(this.el).closest(".edit").slideUp(500, function () {
-				jQuery.ajax({
-					url:'/mrg_admin_quick_edit/edits/'+this.model.get('id'),
-					type:'DELETE',
-					data:this.model.toJSON()
-				});
-				this.model.destroy();
-				this.remove();
+				if (this.model.get('id')) {
+					//$.ajax({
+					//	url:'/mrg_admin_quick_edit/edits/'+this.model.get('id'),
+					//	type:'DELETE',
+					//	data:this.model.toJSON()
+					//});
+					this.model.destroy({data:JSON.stringify(this.model.toJSON()), contentType: 'application/json'});
+					//this.remove();
+				}
 			}.bind(this));
 		}
-	}
+	},
+	_check_pressed_key : function (e){
+		if (e.which == 9 || e.which == 13) {
+			e.preventDefault();
+			jQuery(e.target).blur();
+		}
+	},
 
 });
 
@@ -100,7 +159,6 @@ Edit.View = Backbone.View.extend({
 			},
 			template : _.template(jQuery('#EditFileViewTemplate').html()),
 			render : function () {
-				console.log(this.model.attributes);
 				return this.$el.html(this.template(this.model.attributes));
 			},
 			_delete_file : function () {
@@ -276,7 +334,8 @@ Edit.ViewCollection = Backbone.View.extend({
 		this.addAll();
 	},
 	createOne : function () {
-		data = {title:"The first title",description:"New Entry",author:"sally", published:0, id:null, model:model_name};
+		console.log(model_defaults);
+		data = model_defaults;
 		this.collection.create(data, {wait:true});
 	},
 
