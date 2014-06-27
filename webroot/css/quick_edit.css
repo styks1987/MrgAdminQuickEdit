@@ -1,6 +1,9 @@
 .wysiwyg_content{display: none;}
 .wysiwyg_content .content{outline-color: transparent;}
 .modal-body .wysiwyg_content{display: block;}
+.modal-body .wysiwyg_content img{width:100%;}
+
+.modal-body .wysiwyg_content .content{padding: 20px;border: solid 1px #efefef;margin-top: 20px;}
 
 .loader{position: absolute; width: 75px; height: 30px; padding: 10px; top:0; right: 0; opacity: .5; background:  url('../img/ajax-loader.gif') no-repeat center; z-index: 10000; text-align: center; line-height: 0;background-size:100%;}
 

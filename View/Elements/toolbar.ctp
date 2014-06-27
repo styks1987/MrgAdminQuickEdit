@@ -1,4 +1,4 @@
-<div class="btn-toolbar" data-role="editor-toolbar" data-target="editor_<%= id %>">
+<div class="btn-toolbar" data-role="editor-toolbar" data-target="editor_<?php echo $field_name; ?>_<%= id %>">
       <!--<div class="btn-group">-->
       <!--  <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font"><i class="icon-font"></i><b class="caret"></b></a>-->
       <!--    <ul class="dropdown-menu">-->

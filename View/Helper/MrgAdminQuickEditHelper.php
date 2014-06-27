@@ -209,13 +209,13 @@
 		}
 
 		private function _input_text($field_name){
-			$input = $this->Html->link('', 'javascript:void(0)', ['class'=>'glyphicon glyphicon-file edit_text']);
+			$input = $this->Html->link('', 'javascript:void(0)', ['class'=>'glyphicon glyphicon-file edit_text', 'data-field'=>$field_name]);
 			$content = 	'<div class="wysiwyg_content">'.
-							$this->_View->element('MrgAdminQuickEdit.toolbar').
-							'<div class="content" id="editor_<%= id %>" data-field="'.$field_name.'"><%= '.$field_name.' %></div>'.
+							$this->_View->element('MrgAdminQuickEdit.toolbar', ['field_name'=>$field_name]).
+							'<div class="content" id="editor_'.$field_name.'_<%= id %>" data-field="'.$field_name.'"><%= '.$field_name.' %></div>'.
 
 						'</div>';
-			$input .= $this->_View->element('MrgAdminQuickEdit.modal', ['content'=>$content]);
+			$input .= $this->_View->element('MrgAdminQuickEdit.modal', ['content'=>$content, 'field_name'=>$field_name]);
 
 			return $input;
 		}

@@ -39,26 +39,31 @@ Edit.View = Backbone.View.extend({
 		}
 	},
 	_enable_edit_text : function (e){
-		if (typeof this.modal_window != 'undefined') {
-			this.modal_window.modal("show");
+		field_name = $(e.target).data('field');
+
+		if (typeof this.modal_window == 'undefined') {
+			this.modal_window = {};
+		}
+
+		if (typeof this.modal_window != 'undefined' && typeof this.modal_window[field_name] != 'undefined') {
+			this.modal_window[field_name].modal("show");
 		}else{
-			this.modal_window = $(e.target).next('#modal_'+this.model.get('id')).modal({
+			this.modal_window[field_name] = {};
+
+			this.modal_window[field_name] = $(e.target).next('#modal_'+field_name+'_'+this.model.get('id')).modal({
 				backdrop:true,
 				show:true,
 			});
-			this.modal_window.on('shown.bs.modal', function (e) {
-				console.log('shown');
-				content = $(e.target).find('.content');
-				content.wysiwyg();
+			this.modal_window[field_name].on('shown.bs.modal', function (e) {
+				this.modal_window[field_name].content = $(e.target).find('.content');
+				this.modal_window[field_name].content.wysiwyg();
 				$(e.target).find('.dropdown-menu input').click(function(event){
 						event.stopPropagation();
 				});
-			});
+			}.bind(this));
 
-			this.modal_window.on('click', '.save', function (e) {
-				console.log('save');
-				html = content.cleanHtml();
-				field_name = content.data('field');
+			this.modal_window[field_name].on('click', '.save', function (e) {
+				html = this.modal_window[field_name].content.cleanHtml();
 				this._update_text(html, field_name);
 			}.bind(this))
 		}
