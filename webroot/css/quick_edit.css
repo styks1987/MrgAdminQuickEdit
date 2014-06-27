@@ -1,0 +1,6 @@
+.wysiwyg_content{display: none;}
+.wysiwyg_content .content{outline-color: transparent;}
+.modal-body .wysiwyg_content{display: block;}
+
+.loader{position: absolute; width: 75px; height: 30px; padding: 10px; top:0; right: 0; opacity: .5; background:  url('../img/ajax-loader.gif') no-repeat center; z-index: 10000; text-align: center; line-height: 0;background-size:100%;}
+

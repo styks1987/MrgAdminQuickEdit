@@ -32,7 +32,10 @@
 			);
 
 			// This has to be loaded last
+			echo $this->Html->css('MrgAdminQuickEdit.quick_edit');
 			echo $this->Html->script('MrgAdminQuickEdit.jquery.filedrop');
+			echo $this->Html->script('MrgAdminQuickEdit.jquery.hotkeys');
+			echo $this->Html->script('MrgAdminQuickEdit.bootstrap-wysiwyg');
 			echo $this->Html->script('MrgAdminQuickEdit.quick_edit_app');
 
 
@@ -86,8 +89,8 @@
 			// Build the template that is going to be used by backbone.
 			foreach($this->fields as $field){
 				$contentEditable = ($this->model->primaryKey == $field) ? "false" : "true";
-				$field_input = $this->_get_input($field);
-				$row_fields[] = $this->Html->tag('td', '<span contentEditable="'.$contentEditable.'" data-field="'.$field.'">'.$field_input.'</span>');
+				$field_input = $this->_get_input($field, $contentEditable);
+				$row_fields[] = $this->Html->tag('td', $field_input);
 			}
 
 			$row_fields[] = $this->Html->tag('td',
@@ -154,18 +157,25 @@
 		 *
 		 * Date Added: Tue, Jun 24, 2014
 		 */
-		private function _get_input($field_name){
+		private function _get_input($field_name, $contentEditable = false){
 			$field_type = $this->model->getColumnType($field_name);
 
 			switch($field_type){
 				case 'boolean':
 					$input = $this->_input_boolean($field_name);
 					break;
+				case 'datetime':
+					$input = $this->_input_datetime($field_name);
+					break;
+				case 'text':
+					// This is long text (TEXT)
+					$input = $this->_input_text($field_name);
+					break;
 				case null:
 					$input = $this->_input_related($field_name);
 					break;
 				default :
-					$input = '<%= '.$field_name.' %>';
+					$input = '<span contentEditable="'.$contentEditable.'" data-field="'.$field_name.'"><%= '.$field_name.' %></span>';
 					break;
 			}
 			return $input;
@@ -173,7 +183,7 @@
 
 
 		private function _input_boolean($field_name){
-			return '<input type="checkbox" name="'.$field_name.'" <% if('.$field_name.' == 1){%>checked="checked"<%}%> />';
+			return '<input type="checkbox" data-field="'.$field_name.'" name="'.$field_name.'" <% if('.$field_name.' == 1){%>checked="checked"<%}%> />';
 		}
 
 		private function _input_related($field_name){
@@ -195,6 +205,23 @@
 				$input .= "<a href='javascript:void(0)' class='glyphicon glyphicon-plus add_related' data-field='".Inflector::underscore($field_name)."_id' data-model='".$field_name."'></a>";
 			$input .= "</div>";
 
+			return $input;
+		}
+
+		private function _input_text($field_name){
+			$input = $this->Html->link('', 'javascript:void(0)', ['class'=>'glyphicon glyphicon-file edit_text']);
+			$content = 	'<div class="wysiwyg_content">'.
+							$this->_View->element('MrgAdminQuickEdit.toolbar').
+							'<div class="content" id="editor_<%= id %>" data-field="'.$field_name.'"><%= '.$field_name.' %></div>'.
+
+						'</div>';
+			$input .= $this->_View->element('MrgAdminQuickEdit.modal', ['content'=>$content]);
+
+			return $input;
+		}
+
+		private function _input_datetime($field_name, $contentEditable=true){
+			$input = '<input name="'.$field_name.'" class="datepicker" contentEditable="'.$contentEditable.'" data-field="'.$field_name.'" value="<%= '.$field_name.' %>" />';
 			return $input;
 		}
 

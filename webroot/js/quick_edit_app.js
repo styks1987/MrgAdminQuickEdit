@@ -12,27 +12,25 @@ Edit.Collection = Backbone.Collection.extend({
 	model:Edit.Model
 })
 
-
-
-
-
-
 Edit.View = Backbone.View.extend({
 	className: 'edit',
 	tagName : 'tr',
 	events : {
 		'change input[type="checkbox"]' : '_update_checkbox',
+		'change input.datepicker' : '_update_date',
 		'change select' : '_update_select',
 		'keyup [contentEditable=true]' : '_update_default',
 		'keydown [contentEditable=true]' : '_check_pressed_key',
 		'click .delete' : '_delete',
 		'click .attachment' : '_toggle_attachment_view',
-		'click .add_related' : '_add_related_field'
+		'click .add_related' : '_add_related_field',
+		'click .edit_text' : "_enable_edit_text"
 	},
 	template : _.template($('#EditViewTemplate').html()),
 	render : function () {
 		return this.$el.html(this.template(this.model.attributes))
 	},
+	// Toggle the section where you can upload images too
 	_toggle_attachment_view : function () {
 		if (this.$el.next('tr[data-id='+this.model.get('id')+']').length > 0) {
 			this.$el.next('tr[data-id='+this.model.get('id')+']').remove();
@@ -40,9 +38,37 @@ Edit.View = Backbone.View.extend({
 			this._show_attachment_view();
 		}
 	},
+	_enable_edit_text : function (e){
+		if (typeof this.modal_window != 'undefined') {
+			this.modal_window.modal("show");
+		}else{
+			this.modal_window = $(e.target).next('#modal_'+this.model.get('id')).modal({
+				backdrop:true,
+				show:true,
+			});
+			this.modal_window.on('shown.bs.modal', function (e) {
+				console.log('shown');
+				content = $(e.target).find('.content');
+				content.wysiwyg();
+				$(e.target).find('.dropdown-menu input').click(function(event){
+						event.stopPropagation();
+				});
+			});
+
+			this.modal_window.on('click', '.save', function (e) {
+				console.log('save');
+				html = content.cleanHtml();
+				field_name = content.data('field');
+				this._update_text(html, field_name);
+			}.bind(this))
+		}
+
+
+	},
+	// Show the section wehre you can upload images
+	// This will clear it out if it already exists
 	_show_attachment_view : function () {
 		this.$el.next('tr[data-id='+this.model.get('id')+']').remove();
-		console.log('show attachment view');
 		tr = $('<tr data-id="'+this.model.get('id')+'" class="file"></tr>')
 		this.$el.after(tr);
 		editFileView = new Edit.View.File({model:this.model, el:tr});
@@ -53,6 +79,8 @@ Edit.View = Backbone.View.extend({
 
 		editViewUpload.render();
 	},
+	// For related fields add a input that can be edited.
+	// When the user leaves the input, it creats a new related piece for them
 	_add_related_field : function (e) {
 		data = $(e.target).data();
 		input = $("<input name='"+data.model+"' />");
@@ -62,7 +90,8 @@ Edit.View = Backbone.View.extend({
 			this._create_related(data.model,data.field, $(e.target).val());
 		}.bind(this));
 	},
-
+	// Send the request to the server for creating a new related row
+	// And assigne it to the current model
 	_create_related : function (model, field, value){
 		name = value;
 
@@ -86,28 +115,28 @@ Edit.View = Backbone.View.extend({
 					this.$el.find('option[value='+response.id+']').attr('selected', 'selected');
 					this._update();
 			}.bind(this)
-		}).send();
-
-
-
-
-
-
+		})
 	},
-	_update_image : function(file,response){
-		this.model.set('Image', {thumb:response.file_url});
 
-		this._show_attachment_view();
-
-	},
-	_update_default : function (e) {
-		field = jQuery(e.target).data('field');
-		this.model.set(field, jQuery(e.target).html());
-
+	_update_text : function (html, field_name){
+		this.model.set(field_name, html);
 		this._update();
 	},
+	// After uploading a new image replace the existing image
+	_update_image : function(file,response){
+		this.model.set('Image', {thumb:response.file_url});
+		this._show_attachment_view();
+	},
+	_update_default : function (e) {
+		if (!$(e.target).closest('.wysiwyg_content').is('*')) {
+			field = jQuery(e.target).data('field');
+			this.model.set(field, jQuery(e.target).html());
+
+			this._update();
+		}
+	},
 	_update_checkbox : function (e) {
-		field = jQuery(e.target).parent().data('field');
+		field = jQuery(e.target).data('field');
 		value = (jQuery(e.target).is(':checked'))?"true":"false";;
 		this.model.set(field, value);
 		this._update();
@@ -118,8 +147,18 @@ Edit.View = Backbone.View.extend({
 		this.model.set(field, value);
 		this._update();
 	},
+	_update_date : function (e){
+		field = jQuery(e.target).data('field');
+		value = jQuery(e.target).closest('td').find('.datepicker').val();
+		date = new Date(value);
+		value = this._format_date_for_mysql(date);
+		this.model.set(field, value);
+		this._update();
+	},
 	_update : function () {
-		saving_model = {};
+		if (typeof saving_model == 'undefined' ) {
+			saving_model = {}
+		}
 		if (typeof saving_model[this.model.get('id')] != 'undefined') {
 			clearTimeout(saving_model[this.model.get('id')]);
 		}
@@ -127,7 +166,6 @@ Edit.View = Backbone.View.extend({
 		saving_model[this.model.get('id')] = setTimeout(_.bind(this.model.save, this.model), 700);
 	},
 	_delete : function (e) {
-		console.log('delete');
 		if (confirm("Are you sure you want to delete "+this.model.get('title')+"? This cannot be undone.")) {
 			jQuery(this.el).closest(".edit").slideUp(500, function () {
 				if (this.model.get('id')) {
@@ -143,11 +181,21 @@ Edit.View = Backbone.View.extend({
 		}
 	},
 	_check_pressed_key : function (e){
-		if (e.which == 9 || e.which == 13) {
-			e.preventDefault();
-			jQuery(e.target).blur();
+		if (!$(e.target).closest('.wysiwyg_content').is('*')) {
+			if (e.which == 9 || e.which == 13) {
+				e.preventDefault();
+				$(e.target).blur();
+			}
 		}
 	},
+	_format_date_for_mysql : function (date) {
+		if(isNaN(date.getTime())){
+			return null
+		}else{
+			month = parseInt(date.getMonth())+1;
+			return date.getFullYear()+'-'+month+'-'+date.getDate()
+		}
+	}
 
 });
 
@@ -334,7 +382,6 @@ Edit.ViewCollection = Backbone.View.extend({
 		this.addAll();
 	},
 	createOne : function () {
-		console.log(model_defaults);
 		data = model_defaults;
 		this.collection.create(data, {wait:true});
 	},
@@ -344,15 +391,78 @@ Edit.ViewCollection = Backbone.View.extend({
 		edit.set('model', model_name);
 		editView = new Edit.View({model:edit})
 		this.$el.find('#edit_list_region tr:first-of-type').after(editView.render());
+
+		this._setup_dates(editView);
+		//this._setup_wysiwyg(editView);
+
 	},
 	addAll : function () {
 		this.collection.forEach(this.addOne, this);
+	},
+	// Create datepickers
+	// Format dates from the server and format dates going to the server
+	_setup_dates : function (view){
+		view.$el.find('.datepicker').datepicker({
+			autoclose:true,
+			format: 'mm-dd-yyyy'
+		});
+
+		dates = view.$el.find('.datepicker');
+		_.each(dates, function (el, i){
+			date = new Date($(el).val());
+			date = this._format_date_for_view(date);
+			$(el).val(date);
+		}.bind(this))
+	},
+	_format_date_for_view : function (date){
+		if(isNaN(date.getTime())){
+			return null
+		}else{
+			month = parseInt(date.getMonth())+1;
+			day = date.getDate();
+			month = month > 9 ? month : "0"+month;
+			day = day > 9 ? day : "0"+day;
+			return month+'-'+day+'-'+date.getFullYear();
+		}
+	}
+	/*,
+	_setup_wysiwyg : function (view) {
+		editables = view.$el.find('.wysiwyg_content');
+		_.each(editables, function(el, i){
+			$(el).closest
+		});
+	}*/
+});
+
+Edit.View.Loader = Backbone.View.extend({
+	className : 'loader',
+	render : function () {
+		console.log('render');
+		$('body').append(this.$el)
+	},
+	finished : function () {
+		if (typeof finished_loader != 'undefined') {
+			clearTimeout(finished_loader);
+		}
+		this.$el.fadeOut(500,function () {
+			this.$el.css('background', 'transparent');
+			this.$el.html('Saved');
+			this.$el.fadeIn(500);
+		}.bind(this))
+
+		// Save the task when they are finished typing.
+		finished_loader = setTimeout(_.bind(this.hide, this), 2000);
+
+	},
+	hide : function () {
+		this.$el.fadeOut(500, function () {
+			this.remove();
+		}.bind(this));
 	}
 })
 
 $('document').ready(function () {
 	editList = new Edit.Collection();
-	console.log(edit_list);
 	editList.reset(edit_list);
 
 
@@ -360,4 +470,22 @@ $('document').ready(function () {
 	editListView.render();
 
 
+	$(document).ajaxStart(function (){
+		if (typeof loader != 'undefined') {
+			loader.remove();
+		}
+		loader = new Edit.View.Loader()
+		loader.render();
+	});
+
+	$(document).ajaxStop(function (){
+		if (typeof loader != 'undefined') {
+			loader.finished();
+		}
+	});
+
+
+
+
 })
+
