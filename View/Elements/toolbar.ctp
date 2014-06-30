@@ -1,17 +1,14 @@
 <div class="btn-toolbar" data-role="editor-toolbar" data-target="editor_<?php echo $field_name; ?>_<%= id %>">
-      <!--<div class="btn-group">-->
-      <!--  <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font"><i class="icon-font"></i><b class="caret"></b></a>-->
-      <!--    <ul class="dropdown-menu">-->
-      <!--    </ul>-->
-      <!--  </div>-->
-      <!--<div class="btn-group">-->
-      <!--  <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font Size"><i class="icon-text-height"></i>&nbsp;<b class="caret"></b></a>-->
-      <!--    <ul class="dropdown-menu">-->
-      <!--    <li><a data-edit="fontSize 5"><font size="5">Huge</font></a></li>-->
-      <!--    <li><a data-edit="fontSize 3"><font size="3">Normal</font></a></li>-->
-      <!--    <li><a data-edit="fontSize 1"><font size="1">Small</font></a></li>-->
-      <!--    </ul>-->
-      <!--</div>-->
+      <div class="btn-group">
+        <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" title="Font Style">Font Style <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+			<li><a data-edit="formatBlock p"><p>paragraph</p></a></li>
+			<li><a data-edit="formatBlock h1"><h1>h1</h1></a></li>
+			<li><a data-edit="formatBlock h2"><h2>h2</h2></a></li>
+			<li><a data-edit="formatBlock h3"><h3>h3</h3></a></li>
+			<li><a data-edit="formatBlock h4"><h4>h4</h4></a></li>
+          </ul>
+      </div>
       <div class="btn-group">
         <a class="btn btn-default" data-edit="bold" title="Bold (Ctrl/Cmd+B)"><i class="glyphicon glyphicon-bold"></i></a>
         <a class="btn btn-default" data-edit="italic" title="Italic (Ctrl/Cmd+I)"><i class="glyphicon glyphicon-italic"></i></a>

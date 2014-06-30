@@ -24,7 +24,8 @@ Edit.View = Backbone.View.extend({
 		'click .delete' : '_delete',
 		'click .attachment' : '_toggle_attachment_view',
 		'click .add_related' : '_add_related_field',
-		'click .edit_text' : "_enable_edit_text"
+		'click .edit_text' : "_enable_edit_text",
+		'paste [contentEditable=true]' : '_paste_plain_text'
 	},
 	template : _.template($('#EditViewTemplate').html()),
 	render : function () {
@@ -62,9 +63,21 @@ Edit.View = Backbone.View.extend({
 				});
 			}.bind(this));
 
+			this.modal_window[field_name].on('hide.bs.modal', function (e) {
+				new_html = this.modal_window[field_name].content.cleanHtml();
+				current_html = this.model.get(field_name);
+				if (new_html != current_html) {
+					if (!confirm('It looks like you have changes that need to be saved. Press OK to discard changes.')) {
+						e.preventDefault();
+					}else{
+						this.modal_window[field_name].content.html(current_html);
+					}
+				}
+			}.bind(this));
+
 			this.modal_window[field_name].on('click', '.save', function (e) {
 				html = this.modal_window[field_name].content.cleanHtml();
-				this._update_text(html, field_name);
+				this._update_text(field_name, html);
 			}.bind(this))
 		}
 
@@ -123,7 +136,7 @@ Edit.View = Backbone.View.extend({
 		})
 	},
 
-	_update_text : function (html, field_name){
+	_update_text : function (field_name, html){
 		this.model.set(field_name, html);
 		this._update();
 	},
@@ -200,6 +213,11 @@ Edit.View = Backbone.View.extend({
 			month = parseInt(date.getMonth())+1;
 			return date.getFullYear()+'-'+month+'-'+date.getDate()
 		}
+	},
+	_paste_plain_text : function (e) {
+		e.preventDefault();
+		var text = e.originalEvent.clipboardData.getData("text/plain");
+		document.execCommand("insertHTML", false, text);
 	}
 
 });
@@ -430,13 +448,6 @@ Edit.ViewCollection = Backbone.View.extend({
 			return month+'-'+day+'-'+date.getFullYear();
 		}
 	}
-	/*,
-	_setup_wysiwyg : function (view) {
-		editables = view.$el.find('.wysiwyg_content');
-		_.each(editables, function(el, i){
-			$(el).closest
-		});
-	}*/
 });
 
 Edit.View.Loader = Backbone.View.extend({
@@ -488,7 +499,6 @@ $('document').ready(function () {
 			loader.finished();
 		}
 	});
-
 
 
 
