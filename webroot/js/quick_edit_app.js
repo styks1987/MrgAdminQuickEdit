@@ -93,7 +93,8 @@ Edit.View = Backbone.View.extend({
 		editFileView.on('image_deleted', this._show_attachment_view, this);
 		editFileView.render();
 		editViewUpload = new Edit.View.Upload({upload_box:'#dropbox_'+this.model.get('id'), upload_url:'/mrg_admin_quick_edit/edits/files/'+this.model.get('id')+'/'+model_name, model:this.model});
-		editViewUpload.on('finished_upload', this._update_image, this);
+		editViewUpload.on('upload_start', this._upload_start, editFileView);
+		editViewUpload.on('upload_finish', this._update_image, this);
 
 		editViewUpload.render();
 	},
@@ -136,6 +137,9 @@ Edit.View = Backbone.View.extend({
 		})
 	},
 
+	_upload_start : function () {
+		this.$el.find('td').html('Uploading...');
+	},
 	_update_text : function (field_name, html){
 		this.model.set(field_name, html);
 		this._update();
@@ -200,7 +204,8 @@ Edit.View = Backbone.View.extend({
 	},
 	_check_pressed_key : function (e){
 		if (!$(e.target).closest('.wysiwyg_content').is('*')) {
-			if (e.which == 9 || e.which == 13) {
+			console.log(e.which);
+			if (/*e.which == 9 || */e.which == 13) {
 				e.preventDefault();
 				$(e.target).blur();
 			}
@@ -328,61 +333,16 @@ Edit.View = Backbone.View.extend({
 			}
 		},
 		progress_updated : function (i, file, progress) {
-			jQuery.data(file).find('.progress').width(progress);
+			$(this.el).find('.progress').width(progress);
 		},
 		upload_started : function (i, file, len) {
-			this.create_image(file);
+			this.trigger('upload_start');
 		},
 		upload_finished : function (i,file,response){
-			if (response.status) {
-				jQuery.data(file).addClass('done');
-			}else{
-				jQuery.data(file).addClass('error');
-			}
-			this.display_url(file,response);
-			this.trigger('finished_upload', file, response);
-			// response is the JSON object that post_file.php returns
-		},
-		create_image : function (file){
-			var template = '<div class="preview">'+
-					//'<span class="imageHolder">'+
-					//    '<img />'+
-					//    '<span class="uploaded"></span>'+
-					//'</span>'+
-					'<div class="progressHolder">'+
-						'<div class="progress"></div>'+
-					'</div>'+
-				'</div>';
-			var preview = jQuery(template),
-			image = jQuery('img', preview);
-
-			var reader = new FileReader();
-
-			image.width = 100;
-			image.height = 100;
-
-			reader.onload = function(e){
-				// e.target.result holds the DataURL which
-				// can be used as a source of the image:
-				image.attr('src',e.target.result);
-			};
-
-			// Reading the file as a DataURL. When finished,
-			// this will trigger the onload function above:
-			reader.readAsDataURL(file);
-
-			//preview.appendTo(this.dropbox);
-
-			// Associating a preview container
-			// with the file, using jQuery's $.data():
-
-			jQuery.data(file,preview);
+			this.trigger('upload_finish', file, response);
 		},
 		show_message : function (msg){
 			message.html(msg);
-		},
-		display_url : function (file, response) {
-			jQuery.data(file).find('.progressHolder').replaceWith('<p>'+response.target_filename+'</p>');
 		}
 	});
 
