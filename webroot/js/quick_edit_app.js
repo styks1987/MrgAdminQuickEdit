@@ -453,7 +453,6 @@ Edit.ViewCollection = Backbone.View.extend({
 Edit.View.Loader = Backbone.View.extend({
 	className : 'loader',
 	render : function () {
-		console.log('render');
 		$('body').append(this.$el)
 	},
 	finished : function () {
