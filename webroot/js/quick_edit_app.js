@@ -204,7 +204,6 @@ Edit.View = Backbone.View.extend({
 	},
 	_check_pressed_key : function (e){
 		if (!$(e.target).closest('.wysiwyg_content').is('*')) {
-			console.log(e.which);
 			if (/*e.which == 9 || */e.which == 13) {
 				e.preventDefault();
 				$(e.target).blur();
