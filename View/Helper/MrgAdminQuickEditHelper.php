@@ -200,6 +200,8 @@
 			App::import('Model', $field_name);
 			$this->related_model = new $field_name();
 
+			$fkey = Inflector::singularize(Inflector::tableize($this->related_model->alias)).'_id';
+
 			$list = $this->related_model->find('list');
 			$input = "<div class='row' style='min-width:200px'>";
 			$input .= "<div class='col-sm-9' style='padding-right:0;'>";
@@ -207,7 +209,7 @@
 				$input .= "<option value=0>-- Choose an Option --</option>";
 				foreach($list as $id => $value){
 					$input .= "<option
-								<% if(".$this->related_model->name." && ".$this->related_model->name.".".$this->related_model->primaryKey." == ".$id."){%> selected='selected' <%}%>
+								<% if(".$this->related_model->name." && ".$fkey." == ".$id."){%> selected='selected' <%}%>
 								value='".$id."'>".$value."</option>";
 				}
 				$input .= "</select>";
