@@ -8,6 +8,7 @@
 		var $model;
 		var $data;
 		var $fields;
+		var $related_lists;
 
 
 		public function table_edit($url_root, $fields, $data=[], $model){
@@ -15,6 +16,7 @@
 			$this->_set_fields($fields);
 			$this->_set_data($data);
 			$this->_set_options();
+			$this->_set_related_lists($model);
 			$this->_get_field_defaults();
 
 			echo $this->Html->div('', '', ['id'=>'edit_region']);
@@ -28,7 +30,8 @@
 				"var edit_list = ".json_encode($this->data).";".
 				"var urlRoot = '".$url_root."';".
 				"var model_name = '".$this->model->name."';".
-				"var model_defaults = ".json_encode($this->defaults).";"
+				"var model_defaults = ".json_encode($this->defaults).";".
+				"var related_lists = ".json_encode($this->related_lists).";"
 			);
 
 			// This has to be loaded last
@@ -66,6 +69,20 @@
 			$this->options['fields'] = $this->fields;
 
 		}
+		/**
+		 * gather the related lists for select box options
+		 *
+		 * Date Added: Tue, Jul 01, 2014
+		 */
+
+		private function _set_related_lists($model){
+			$related_models = $this->model->getAssociated('belongsTo');
+			foreach($related_models as $r){
+				App::import('Model', $r);
+				$this->related_model = new $r();
+				$this->related_lists[$r] = $this->related_model->find('list');
+			}
+		}
 
 		private function _get_field_defaults(){
 			//{ id:null, NewsCategory:{id:1},    title:"The first title",published:0,, model:model_name, news_category_id:1, published_date : null};
@@ -78,6 +95,13 @@
 					case 'text':
 					case 'string':
 						$this->defaults[$field] = '<span>Placeholder Text</span>';
+						break;
+					case null:
+						App::import('Model', $field);
+						$this->related_model = new $field();
+						$fkey = Inflector::singularize(Inflector::tableize($this->related_model->alias)).'_id';
+						$this->defaults[$fkey] = null;
+						$this->defaults[$field] = null;
 						break;
 					default:
 						$this->defaults[$field] = null;
@@ -202,16 +226,16 @@
 
 			$fkey = Inflector::singularize(Inflector::tableize($this->related_model->alias)).'_id';
 
-			$list = $this->related_model->find('list');
 			$input = "<div class='row' style='min-width:200px'>";
 			$input .= "<div class='col-sm-9' style='padding-right:0;'>";
 				$input .= "<select style='width:100%;' data-field='".Inflector::underscore($field_name)."_id' name='".Inflector::underscore($field_name)."_id'>";
 				$input .= "<option value=0>-- Choose an Option --</option>";
-				foreach($list as $id => $value){
-					$input .= "<option
-								<% if(".$this->related_model->name." && ".$fkey." == ".$id."){%> selected='selected' <%}%>
-								value='".$id."'>".$value."</option>";
-				}
+				$input .= "<% _.each(lists['".$field_name."'], function (value, related_id){ %>";
+				$input .= "<option
+								<% if(".$fkey." == related_id){%> selected='selected' <%}%>
+								value='<%= related_id %>'><%= value %></option>";
+				$input .= "<% }); %>";
+
 				$input .= "</select>";
 			$input .= "</div><div class='col-sm-1'>";
 				$input .= "<a href='javascript:void(0)' class='glyphicon glyphicon-plus add_related' data-field='".Inflector::underscore($field_name)."_id' data-model='".$field_name."'></a>";

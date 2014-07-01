@@ -31,6 +31,7 @@ Edit.View = Backbone.View.extend({
 	},
 	template : _.template($('#EditViewTemplate').html()),
 	render : function () {
+		this.model.set('lists', this.model.collection.related_lists);
 		return this.$el.html(this.template(this.model.attributes))
 	},
 	// Toggle the section where you can upload images too
@@ -123,18 +124,19 @@ Edit.View = Backbone.View.extend({
 			dataType:'json',
 			complete : function (response) {
 				response = response.responseJSON;
-				related = this.model.get(model);
+				related = {}
+				if(this.model.get(model)){
+					related = this.model.get(model);
+				}
 				related.id = response.id;
 				related.name = response.name;
 				this.model.set(model, related);
 				this.model.set(field, response.id);
 
-				selects = 'select[name="'+field+'"]';
+				this.model.collection.related_lists[model][related.id] = related.name;
+
 				this.$el.html(this.template(this.model.attributes));
-					option = $('<option value='+response.id+'>'+response.name+'</option>');
-					$(selects).append(option);
-					this.$el.find('option[value='+response.id+']').attr('selected', 'selected');
-					this._update();
+				this._update();
 			}.bind(this)
 		})
 	},
@@ -352,6 +354,8 @@ Edit.ViewCollection = Backbone.View.extend({
 	initialize : function (params) {
 		this.options = _.extend(this.options, params.options);
 		this.collection.on('sync', this.render, this);
+		// Set globally by the helper
+		this.collection.related_lists = related_lists;
 	},
 	options: {
 		fields:[],
