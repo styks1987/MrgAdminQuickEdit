@@ -42,12 +42,12 @@
 			App::import('Model', $model);
 			$this->model = new $model;
 			if($this->model->delete($id)) {
-				$this->files($id, $model);
+				$this->files($id, $model, true);
 				$message = 1;
 			} else {
 				$message = 0;
 			}
-			echo json_encode($message);
+			echo $message;
 			exit;
 		}
 		/**
@@ -67,7 +67,7 @@
 			exit;
 		}
 
-		function files($foreign_key, $model='Other'){
+		function files($foreign_key, $model='Other', $return = false){
 			$behavior = 'Attachment';
 			$class = 'Image';
 
@@ -115,8 +115,9 @@
 					$return_data['message'] = $message;
 				}
 			}
-			$this->_exit_status($return_data);
-
+			if(!$return){
+				$this->_exit_status($return_data);
+			}
 		}
 
 
@@ -138,6 +139,7 @@
 		 */
 
 		private function _exit_status($return_data){
+			header('Content-Type: application/json');
 			echo json_encode($return_data);
 			exit;
 		}

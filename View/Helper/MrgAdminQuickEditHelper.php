@@ -72,7 +72,17 @@
 			//{"id":null,"NewsCategory":{"id":1},"title":null,"author":null,"published":null,"published_date":null,"news_category_id":1,"model":"News"}
 			$this->defaults = [];
 			foreach($this->fields as $field){
-				$this->defaults[$field] = null;
+				$field_type = $this->model->getColumnType($field);
+
+				switch($field_type){
+					case 'text':
+					case 'string':
+						$this->defaults[$field] = '<span>Placeholder Text</span>';
+						break;
+					default:
+						$this->defaults[$field] = null;
+						break;
+				}
 			}
 
 			$this->defaults['model'] = $this->model->name;

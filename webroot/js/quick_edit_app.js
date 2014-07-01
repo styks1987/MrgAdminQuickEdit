@@ -9,6 +9,7 @@ Edit.Model = Backbone.Model.extend({
 	urlRoot:'/mrg_admin_quick_edit/edits'
 });
 Edit.Collection = Backbone.Collection.extend({
+	url:'/mrg_admin_quick_edit/edits',
 	model:Edit.Model
 })
 
@@ -21,6 +22,7 @@ Edit.View = Backbone.View.extend({
 		'change select' : '_update_select',
 		'keyup [contentEditable=true]' : '_update_default',
 		'keydown [contentEditable=true]' : '_check_pressed_key',
+		'click [contentEditable=true]' : '_clear_placeholder',
 		'click .delete' : '_delete',
 		'click .attachment' : '_toggle_attachment_view',
 		'click .add_related' : '_add_related_field',
@@ -189,17 +191,13 @@ Edit.View = Backbone.View.extend({
 	},
 	_delete : function (e) {
 		if (confirm("Are you sure you want to delete "+this.model.get('title')+"? This cannot be undone.")) {
-			jQuery(this.el).closest(".edit").slideUp(500, function () {
-				if (this.model.get('id')) {
-					//$.ajax({
-					//	url:'/mrg_admin_quick_edit/edits/'+this.model.get('id'),
-					//	type:'DELETE',
-					//	data:this.model.toJSON()
-					//});
-					this.model.destroy({data:JSON.stringify(this.model.toJSON()), contentType: 'application/json'});
-					//this.remove();
-				}
-			}.bind(this));
+			this.model.destroy({data:JSON.stringify(this.model.toJSON()), contentType: 'application/json', wait:true});
+			this.remove();
+		}
+	},
+	_clear_placeholder : function (e){
+		if($(e.currentTarget).find('span').is('*')){
+			$(e.currentTarget).html('\u00a0');
 		}
 	},
 	_check_pressed_key : function (e){
@@ -369,14 +367,11 @@ Edit.ViewCollection = Backbone.View.extend({
 	},
 
 	addOne:function (edit){
-		edit = new Edit.Model(edit.attributes);
 		edit.set('model', model_name);
 		editView = new Edit.View({model:edit})
 		this.$el.find('#edit_list_region tr:first-of-type').after(editView.render());
 
 		this._setup_dates(editView);
-		//this._setup_wysiwyg(editView);
-
 	},
 	addAll : function () {
 		this.collection.forEach(this.addOne, this);
@@ -438,11 +433,8 @@ Edit.View.Loader = Backbone.View.extend({
 $('document').ready(function () {
 	editList = new Edit.Collection();
 	editList.reset(edit_list);
-
-
 	editListView = new Edit.ViewCollection({collection:editList, el:'#edit_region', options:options});
 	editListView.render();
-
 
 	$(document).ajaxStart(function (){
 		if (typeof loader != 'undefined') {
