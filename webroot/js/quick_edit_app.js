@@ -67,13 +67,15 @@ Edit.View = Backbone.View.extend({
 			}.bind(this));
 
 			this.modal_window[field_name].on('hide.bs.modal', function (e) {
-				new_html = this.modal_window[field_name].content.cleanHtml();
-				current_html = this.model.get(field_name);
-				if (new_html != current_html) {
-					if (!confirm('It looks like you have changes that need to be saved. Press OK to discard changes.')) {
-						e.preventDefault();
-					}else{
-						this.modal_window[field_name].content.html(current_html);
+				if (!$(e.currentTarget).hasClass('save')) {
+					new_html = this.modal_window[field_name].content.cleanHtml();
+					current_html = this.model.get(field_name);
+					if (new_html != current_html) {
+						if (!confirm('It looks like you have changes that need to be saved. Press OK to discard changes.')) {
+							e.preventDefault();
+						}else{
+							this.modal_window[field_name].content.html(current_html);
+						}
 					}
 				}
 			}.bind(this));
@@ -353,7 +355,7 @@ Edit.ViewCollection = Backbone.View.extend({
 	},
 	initialize : function (params) {
 		this.options = _.extend(this.options, params.options);
-		this.collection.on('sync', this.render, this);
+		//this.collection.on('sync', this.render, this);
 		// Set globally by the helper
 		this.collection.related_lists = related_lists;
 	},
@@ -368,6 +370,7 @@ Edit.ViewCollection = Backbone.View.extend({
 	createOne : function () {
 		data = model_defaults;
 		this.collection.create(data, {wait:true});
+		this.render();
 	},
 
 	addOne:function (edit){
@@ -413,18 +416,24 @@ Edit.View.Loader = Backbone.View.extend({
 	render : function () {
 		$('body').append(this.$el)
 	},
-	finished : function () {
+	finished : function (event, request, settings) {
+		console.log(request);
 		if (typeof finished_loader != 'undefined') {
 			clearTimeout(finished_loader);
 		}
 		this.$el.fadeOut(500,function () {
-			this.$el.css('background', 'transparent');
-			this.$el.html('Saved');
-			this.$el.fadeIn(500);
+			if (request.status == '200') {
+				this.$el.addClass('saved');
+				this.$el.html('Saved');
+			}else{
+				this.$el.addClass('error');
+				this.$el.html('Failed ('+request.status+')');
+			}
+				this.$el.fadeIn(500);
 		}.bind(this))
 
 		// Save the task when they are finished typing.
-		finished_loader = setTimeout(_.bind(this.hide, this), 2000);
+		finished_loader = setTimeout(_.bind(this.hide, this), 5000);
 
 	},
 	hide : function () {
@@ -448,9 +457,9 @@ $('document').ready(function () {
 		loader.render();
 	});
 
-	$(document).ajaxStop(function (){
+	$(document).ajaxComplete(function (event, request, settings){
 		if (typeof loader != 'undefined') {
-			loader.finished();
+			loader.finished(event, request, settings);
 		}
 	});
 

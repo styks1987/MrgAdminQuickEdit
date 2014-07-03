@@ -193,7 +193,6 @@
 		 */
 		private function _get_input($field_name, $contentEditable = false){
 			$field_type = $this->model->getColumnType($field_name);
-
 			switch($field_type){
 				case 'boolean':
 					$input = $this->_input_boolean($field_name);
@@ -202,6 +201,7 @@
 					$input = $this->_input_datetime($field_name);
 					break;
 				case 'text':
+				case 'binary':
 					// This is long text (TEXT)
 					$input = $this->_input_text($field_name);
 					break;
