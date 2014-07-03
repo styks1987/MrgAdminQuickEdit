@@ -417,7 +417,6 @@ Edit.View.Loader = Backbone.View.extend({
 		$('body').append(this.$el)
 	},
 	finished : function (event, request, settings) {
-		console.log(request);
 		if (typeof finished_loader != 'undefined') {
 			clearTimeout(finished_loader);
 		}
