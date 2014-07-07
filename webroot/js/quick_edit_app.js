@@ -370,7 +370,7 @@ Edit.ViewCollection = Backbone.View.extend({
 	createOne : function () {
 		data = model_defaults;
 		this.collection.create(data, {wait:true});
-		this.render();
+		this.collection.once('sync', this.render.bind(this));
 	},
 
 	addOne:function (edit){
