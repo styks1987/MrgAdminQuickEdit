@@ -57,8 +57,9 @@
 			$this->data = [];
 			foreach($data as $item){
 				foreach($this->model->getAssociated() as $assoc=>$type){
-					if(!empty($item[$assoc]));
-					$item[$this->model->name][$assoc] = $item[$assoc];
+					if(!empty($item[$assoc])){
+						$item[$this->model->name][$assoc] = $item[$assoc];
+					}
 				}
 
 				$this->data[] = $item[$this->model->name];
