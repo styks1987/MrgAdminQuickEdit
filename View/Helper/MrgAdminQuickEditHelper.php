@@ -130,7 +130,8 @@
 
 			$row_fields[] = $this->Html->tag('td',
 				$this->Html->link('', 'javascript:void(0)', ['class'=>'glyphicon glyphicon-trash delete'])." | ".
-				$this->Html->link('', 'javascript:void(0)', ['class'=>'glyphicon glyphicon-picture attachment'])
+				$this->Html->link('', 'javascript:void(0)', ['class'=>'glyphicon glyphicon-picture attachment'])." | ".
+				'<a href="/'.Inflector::pluralize(Inflector::underscore($this->model->name)).'/view/<%= id %>" target="_blank" class="glyphicon glyphicon-share-alt" /></a>'
 			);
 
 			$this->fields[] = 'Actions';
