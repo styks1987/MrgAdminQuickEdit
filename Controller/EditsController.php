@@ -27,6 +27,19 @@
 			$model = $data['model'];
 			App::import('Model', $model);
 			$this->model = new $model;
+			foreach($data as $column=>&$value){
+				if($this->model->getColumnType($column) && $this->model->getColumnType($column) != 'text'){
+					$value = strip_tags($value);
+
+				}elseif($this->model->getColumnType($column) == 'text'){
+					$doc = new DOMDocument();
+					$doc->loadHTML($value);
+
+					$value = $this->_parse_data_images($doc);
+				}
+			}
+
+
 
 			if($this->model->save($data)){
 				echo json_encode($data);
@@ -34,6 +47,42 @@
 				echo 0;
 			}
 			exit;
+		}
+
+		private function _parse_data_images($doc){
+			$img_dir = '/files/images/';
+			$imgs = $doc->getElementsByTagName("img");
+
+			define('UPLOAD_DIR', APP.WEBROOT_DIR.$img_dir);
+
+			foreach($imgs as $img){
+				$img_file = $img->getAttribute('src');
+
+				if(strstr($img_file, 'data:image/png;base64')){
+					$extension = 'png';
+					$img_file = str_replace('data:image/png;base64,', '', $img_file);
+				}elseif(strstr($img_file, 'data:image/jpeg;base64')){
+					$extension = 'jpg';
+					$img_file = str_replace('data:image/jpeg;base64,', '', $img_file);
+				}else{
+					$img->removeChild();
+					continue;
+				}
+
+
+				$img_file = str_replace(' ', '+', $img_file);
+				$img_data = base64_decode($img_file);
+				$file_name = uniqid() . '.'.$extension;
+				$file = UPLOAD_DIR . $file_name;
+				$success = file_put_contents($file, $img_data);
+				//$success ? $file : 'Unable to save the file.';
+
+				$img->setAttribute( 'src' , $img_dir.$file_name );
+			}
+
+
+			# remove <html><body></body></html>
+			return preg_replace('~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $doc->saveHTML());
 		}
 
 		function delete($id){

@@ -22,7 +22,7 @@ Edit.View = Backbone.View.extend({
 		'change select' : '_update_select',
 		'keyup [contentEditable=true]' : '_update_default',
 		'keydown [contentEditable=true]' : '_check_pressed_key',
-		'click [contentEditable=true]' : '_clear_placeholder',
+		//'click [contentEditable=true]' : '_clear_placeholder',
 		'click .delete' : '_delete',
 		'click .attachment' : '_toggle_attachment_view',
 		'click .add_related' : '_add_related_field',

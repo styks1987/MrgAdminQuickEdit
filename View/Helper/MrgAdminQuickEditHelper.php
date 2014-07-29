@@ -95,7 +95,7 @@
 				switch($field_type){
 					case 'text':
 					case 'string':
-						$this->defaults[$field] = '<span>Placeholder Text</span>';
+						$this->defaults[$field] = '';
 						break;
 					case null:
 						App::import('Model', $field);
