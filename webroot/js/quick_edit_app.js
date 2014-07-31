@@ -27,7 +27,7 @@ Edit.View = Backbone.View.extend({
 		'click .attachment' : '_toggle_attachment_view',
 		'click .add_related' : '_add_related_field',
 		'click .edit_text' : "_enable_edit_text",
-		'paste [contentEditable=true]' : '_paste_plain_text'
+		//'paste [contentEditable=true]' : '_paste_plain_text'
 	},
 	template : _.template($('#EditViewTemplate').html()),
 	render : function () {
@@ -224,6 +224,7 @@ Edit.View = Backbone.View.extend({
 		e.preventDefault();
 		var text = e.originalEvent.clipboardData.getData("text/plain");
 		document.execCommand("insertHTML", false, text);
+
 	}
 
 });
