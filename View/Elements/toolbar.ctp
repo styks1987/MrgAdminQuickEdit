@@ -23,10 +23,11 @@
       </div>
       <div class="btn-group">
 			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="Hyperlink" id="link_dropdown__<%= id %>"><i class="glyphicon glyphicon-link"></i></button>
-			<div class="dropdown-menu input-append" aria-labeledby="link_dropdown_<%= id %>">
-				<input onclick="" placeholder="URL" type="text" data-edit="createLink"/>
+			<div class="dropdown-menu input-append" aria-labeledby="link_dropdown_<%= id %>" style="padding: 10px; min-width:400px;">
+				<input onclick="" placeholder="URL" type="text" data-edit="createLink" style="margin-bottom:5px; width:250px; height:35px; padding: 2px 5px;"/>
 				<button class="btn btn-primary" type="button">Add</button>
 			</div>
+			<a class="btn btn-default" data-edit="unlink" title="Unlink selected text"><i class="glyphicon glyphicon-minus-sign"></i></a>
       </div>
 	  <div class="btn-group">
 		<a class="btn btn-default" title="" id="pictureBtn" data-original-title="Insert picture (or just drag &amp; drop)"><i class="glyphicon glyphicon-picture"></i></a>
