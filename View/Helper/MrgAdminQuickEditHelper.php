@@ -36,9 +36,9 @@
 
 			// This has to be loaded last
 			echo $this->Html->css('MrgAdminQuickEdit.quick_edit');
-			echo $this->Html->script('MrgAdminQuickEdit.jquery.filedrop');
+			echo $this->Html->css('MrgAdminQuickEdit.raptor-front-end');
 			echo $this->Html->script('MrgAdminQuickEdit.jquery.hotkeys');
-			echo $this->Html->script('MrgAdminQuickEdit.bootstrap-wysiwyg');
+			echo $this->Html->script('MrgAdminQuickEdit.raptor.js');
 			echo $this->Html->script('MrgAdminQuickEdit.quick_edit_app');
 
 
@@ -248,9 +248,9 @@
 
 		private function _input_text($field_name){
 			$input = $this->Html->link('', 'javascript:void(0)', ['class'=>'glyphicon glyphicon-file edit_text', 'data-field'=>$field_name]);
-			$content = 	'<div class="wysiwyg_content">'.
-							$this->_View->element('MrgAdminQuickEdit.toolbar', ['field_name'=>$field_name]).
-							'<div class="content" id="editor_'.$field_name.'_<%= id %>" data-field="'.$field_name.'"><%= '.$field_name.' %></div>'.
+			$content = 	'<div class="wysiwyg_content" >'.
+							//$this->_View->element('MrgAdminQuickEdit.toolbar', ['field_name'=>$field_name]).
+							'<div class="content" id="editor_'.$field_name.'_<%= id %>" data-id="<%= id %>" data-field="'.$field_name.'"><%= '.$field_name.' %></div>'.
 
 						'</div>';
 			$input .= $this->_View->element('MrgAdminQuickEdit.modal', ['content'=>$content, 'field_name'=>$field_name]);

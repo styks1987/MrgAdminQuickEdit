@@ -60,30 +60,72 @@ Edit.View = Backbone.View.extend({
 			});
 			this.modal_window[field_name].on('shown.bs.modal', function (e) {
 				this.modal_window[field_name].content = $(e.target).find('.content');
-				this.modal_window[field_name].content.wysiwyg();
-				$(e.target).find('.dropdown-menu input').click(function(event){
-						event.stopPropagation();
+				modal_window = this.modal_window;
+				raptor(this.modal_window[field_name].content).raptor({
+					autoEnable:true,
+					plugins: {
+						fileManager: {
+							uriPublic: '/files/images',
+							uriAction: '/mrg_admin_quick_edit/edits/raptor_upload'
+						},
+						save :{
+							plugin:'saveRest'
+						},
+						saveRest : {
+							url:'/mrg_admin_quick_edit/edits/edit',
+							data:function (html){
+								data = {
+									id: this.raptor.getElement().data('id'),
+
+									model:model_name
+								};
+								data[field_name] = html;
+								return data;
+							}
+						}
+					},
+					layouts: {
+						toolbar: {
+							uiOrder: [
+								['save', 'cancel'],
+								['tagMenu'],
+								['textBold', 'textItalic'],
+								['listOrdered', 'listUnordered'],
+								['linkCreate', 'linkRemove'],
+								['embed', /*'fileManager',*/ 'guides'],
+								['snippetMenu', 'viewSource']
+							]
+						}
+					},
+					bind : {
+						saved : function () {
+
+						}
+					}
 				});
+
 			}.bind(this));
 
 			this.modal_window[field_name].on('hide.bs.modal', function (e) {
-				if (!$(e.currentTarget).hasClass('save')) {
-					new_html = this.modal_window[field_name].content.cleanHtml();
-					current_html = this.model.get(field_name);
-					if (new_html != current_html) {
-						if (!confirm('It looks like you have changes that need to be saved. Press OK to discard changes.')) {
-							e.preventDefault();
-						}else{
-							this.modal_window[field_name].content.html(current_html);
-						}
-					}
-				}
+
+
+				//if (!$(e.currentTarget).hasClass('save')) {
+				//	new_html = this.modal_window[field_name].content.html();
+				//	current_html = this.model.get(field_name);
+				//	if (new_html != current_html) {
+				//		if (!confirm('It looks like you have changes that need to be saved. Press OK to discard changes.')) {
+				//			e.preventDefault();
+				//		}else{
+				//			this.modal_window[field_name].content.html(current_html);
+				//		}
+				//	}
+				//}
 			}.bind(this));
 
-			this.modal_window[field_name].on('click', '.save', function (e) {
-				html = this.modal_window[field_name].content.cleanHtml();
-				this._update_text(field_name, html);
-			}.bind(this))
+			//this.modal_window[field_name].on('click', '.save', function (e) {
+			//	html = this.modal_window[field_name].content.html();
+			//	this._update_text(field_name, html);
+			//}.bind(this))
 		}
 
 

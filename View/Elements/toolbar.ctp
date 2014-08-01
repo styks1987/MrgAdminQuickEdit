@@ -24,7 +24,7 @@
       <div class="btn-group">
 			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="Hyperlink" id="link_dropdown__<%= id %>"><i class="glyphicon glyphicon-link"></i></button>
 			<div class="dropdown-menu input-append" aria-labeledby="link_dropdown_<%= id %>" style="padding: 10px; min-width:400px;">
-				<input onclick="" placeholder="URL" type="text" data-edit="createLink" style="margin-bottom:5px; width:250px; height:35px; padding: 2px 5px;"/>
+				<input onclick="" placeholder="URL" type="text" data-edit="insertHtml" style="margin-bottom:5px; width:250px; height:35px; padding: 2px 5px;"/>
 				<button class="btn btn-primary" type="button">Add</button>
 			</div>
 			<a class="btn btn-default" data-edit="unlink" title="Unlink selected text"><i class="glyphicon glyphicon-minus-sign"></i></a>
@@ -32,7 +32,15 @@
 	  <div class="btn-group">
 		<a class="btn btn-default" title="" id="pictureBtn" data-original-title="Insert picture (or just drag &amp; drop)"><i class="glyphicon glyphicon-picture"></i></a>
         <input type="file" data-role="magic-overlay" data-target="#pictureBtn" data-edit="insertImage" style="opacity: 0; position: absolute; top: 0px; left: 0px; width: 37px; height: 30px;">
+
       </div>
+	  <div class="btn-group">
+		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="Hyperlink" id="html_dropdown__<%= id %>"><i class="glyphicon glyphicon-sound-stereo"></i></button>
+		<!--<div class="dropdown-menu input-append" aria-labeledby="html_dropdown_<%= id %>" style="padding: 10px; min-width:400px;">
+			<input onclick="" placeholder="Simmple HTML" type="text" data-edit="insertHtml" style="margin-bottom:5px; width:250px; height:35px; padding: 2px 5px;"/>
+			<button class="btn btn-primary" type="button">Insert Simple HTML</button>
+		</div>-->
+	  </div>
       <!--<div class="btn-group">-->
         <!--<a class="btn" data-edit="undo" title="Undo (Ctrl/Cmd+Z)"><i class="icon-undo"></i></a>-->
         <!--<a class="btn" data-edit="redo" title="Redo (Ctrl/Cmd+Y)"><i class="icon-repeat"></i></a>-->
