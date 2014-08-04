@@ -9,7 +9,6 @@
 
 		function add(){
 			$data = json_decode(file_get_contents('php://input'), TRUE);
-			debug($this->request->data); exit;
 			$model = $data['model'];
 			App::import('Model', $model);
 			$this->model = new $model;
