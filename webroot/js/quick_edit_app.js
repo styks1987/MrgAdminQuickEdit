@@ -55,7 +55,7 @@ Edit.View = Backbone.View.extend({
 			this.modal_window[field_name] = {};
 
 			this.modal_window[field_name] = $(e.target).next('#modal_'+field_name+'_'+this.model.get('id')).modal({
-				backdrop:true,
+				backdrop:'static',
 				show:true,
 			});
 			this.modal_window[field_name].on('shown.bs.modal', function (e) {
@@ -68,7 +68,22 @@ Edit.View = Backbone.View.extend({
 							uriPublic: '/files/images',
 							uriAction: '/mrg_admin_quick_edit/edits/raptor_upload'
 						},
-						save :{
+						// Need to build the new version before this will work
+						tagMenu : {
+							tags: {
+								h1:'h1',
+								h2:'h2',
+								h3:'h3',
+								h4:'h4',
+								p:'paragraph'
+							}
+						},
+						//snippetMenu: {
+						//	snippets: {
+						//		'Grey Box': '<div class="grey-box"><h1>Grey Box</h1><ul><li>This is a list</li></ul></div>'
+						//	}
+						//},
+						save : {
 							plugin:'saveRest'
 						},
 						saveRest : {
@@ -99,8 +114,11 @@ Edit.View = Backbone.View.extend({
 					},
 					bind : {
 						saved : function () {
-
-						}
+							this.modal_window[field_name].modal('hide');
+						}.bind(this),
+						cancel : function () {
+							this.modal_window[field_name].modal('hide');
+						}.bind(this)
 					}
 				});
 

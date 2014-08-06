@@ -3,8 +3,10 @@
 .modal-body .wysiwyg_content{display: block;}
 .modal-body .wysiwyg_content img{width:100%;}
 
-.modal-body .wysiwyg_content .content{padding: 20px;border: solid 1px #efefef;margin-top: 20px;}
+.modal-body .wysiwyg_content .content{padding: 20px;border: solid 1px #dddddd;margin-top: 40px;}
 
 .loader{position: fixed; width: 100px; height: 30px; padding: 10px; top:0; left: 48%; opacity: .9; background:  #fff url('../img/ajax-loader.gif') no-repeat center; z-index: 20000; text-align: center; line-height: 10px;background-size:100%;}
 .loader.saved{background: #5cb85c; color: #FFF;}
 .loader.error{background: #b82220; color: #FFF;}
+
+
