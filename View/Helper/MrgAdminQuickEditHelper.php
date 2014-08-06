@@ -37,6 +37,7 @@
 			// This has to be loaded last
 			echo $this->Html->css('MrgAdminQuickEdit.quick_edit');
 			echo $this->Html->css('MrgAdminQuickEdit.raptor-front-end');
+			echo $this->Html->script('MrgAdminQuickEdit.jquery.filedrop');
 			echo $this->Html->script('MrgAdminQuickEdit.jquery.hotkeys');
 			echo $this->Html->script('MrgAdminQuickEdit.raptor.js');
 			echo $this->Html->script('MrgAdminQuickEdit.quick_edit_app');
