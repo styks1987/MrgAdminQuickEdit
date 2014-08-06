@@ -157,7 +157,7 @@ Edit.View = Backbone.View.extend({
 		editFileView = new Edit.View.File({model:this.model, el:tr});
 		editFileView.on('image_deleted', this._show_attachment_view, this);
 		editFileView.render();
-		editViewUpload = new Edit.View.Upload({upload_box:'#dropbox_'+this.model.get('id'), upload_url:'/mrg_admin_quick_edit/edits/files/'+this.model.get('id')+'/'+model_name, model:this.model});
+		editViewUpload = new Edit.View.Upload({fallback_id:'fallback_input_'+this.model.get('id'), upload_box:'#dropbox_'+this.model.get('id'), upload_url:'/mrg_admin_quick_edit/edits/files/'+this.model.get('id')+'/'+model_name, model:this.model});
 		editViewUpload.on('upload_start', this._upload_start, editFileView);
 		editViewUpload.on('upload_finish', this._update_image, this);
 
@@ -312,13 +312,15 @@ Edit.View = Backbone.View.extend({
 			}
 		});
 
+
 		Edit.View.Upload = Backbone.View.extend({
 		options : {
+			fallback_id : 'fallback_input',
 			upload_box : '#dropbox',
 			upload_url : '/mrg_admin_quick_edit/edits/files',
 			paramname : 'img',
-			maxfiles : 1, // I don't think this works right now
-			maxfilesize : 15, // I don't think this works right now
+			maxfiles : 1,
+			maxfilesize : 15,
 			valid_file_types : /(pdf|tif|ai|eps|png|jpg|gif)/,
 			data : {
 				'directory' : '/uploads/'+model_name
@@ -339,6 +341,7 @@ Edit.View = Backbone.View.extend({
 			// Load up the filedrop jquery plugin
 			this.FiledropUpload = dropbox.filedrop({
 				// The name of the jQuery_FILES entry:
+				fallback_id	: 	self.options.fallback_id,
 				paramname	:	self.options.paramname,
 				maxfiles 	: 	self.options.maxfiles,
 				maxfilesize	: 	self.options.maxfilesize, // in mb

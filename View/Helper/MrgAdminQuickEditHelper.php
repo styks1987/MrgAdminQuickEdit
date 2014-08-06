@@ -152,7 +152,8 @@
 						'<% if(typeof Image.thumb == "string") {%>'.
 							'<img width=192 src="<%= Image.thumb %>" /> <a href="javascript:void(0)" class="glyphicon glyphicon-trash delete_file"></a>'.
 						'<% }else {%>'.
-							'<div id="dropbox_<%= id %>" style="text-align:center; padding:20px;width:500px; height:50px; border:dotted 1px #444;">Drop Images Here</div>'.
+							'<div id="dropbox_<%= id %>" style="text-align:center; padding:20px;width:500px; height:50px; border:dotted 1px #444;">Click or Drop Images Here</div>'.
+							'<input type="file" id="fallback_input_<%= id %>" />'.
 						'<% } %>',
 						['colspan'=>count($this->fields)]
 					);
