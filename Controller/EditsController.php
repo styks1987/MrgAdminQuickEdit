@@ -13,7 +13,8 @@
 			App::import('Model', $model);
 			$this->model = new $model;
 			$this->model->create();
-			if($this->model->save($data)){
+			unset($data['Image']);
+			if($this->model->saveAll($data)){
 				$data['id'] = $this->model->id;
 				echo json_encode($data, JSON_NUMERIC_CHECK);
 			}else{
@@ -40,8 +41,9 @@
 					$value = $this->_parse_data_images($doc);
 				}*/
 			}
-
-			if($this->model->save($data)){
+			unset($data['Image']);
+			if($this->model->saveAll($data)){
+				$data = $this->model->findById($data['id']);
 				echo json_encode($data);
 			}else{
 				echo 0;

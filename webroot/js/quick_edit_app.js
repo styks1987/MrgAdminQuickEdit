@@ -218,7 +218,20 @@ Edit.View = Backbone.View.extend({
 	_update_default : function (e) {
 		if (!$(e.target).closest('.wysiwyg_content').is('*')) {
 			field = jQuery(e.target).data('field');
-			this.model.set(field, jQuery(e.target).html());
+			// For related models ContentExtra.some_column
+			// We have to save it this way because backbone does not understand dot notation
+			if (field.split('.').length > 1) {
+				related_elements = field.split('.');
+				model = related_elements[0];
+				column = related_elements[1];
+				related = this.model.get(model);
+				related[column] = jQuery(e.target).html();
+				value = related;
+				field = model;
+			}else{
+				value = jQuery(e.target).html()
+			}
+			this.model.set(field, value);
 
 			this._update();
 		}

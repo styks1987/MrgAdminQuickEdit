@@ -53,6 +53,11 @@
 		private function _set_fields($fields){
 			$this->fields = $fields;
 		}
+		/**
+		 * Properly assign the data and associations to be sub arrays
+		 *
+		 * Date Added: Fri, Aug 08, 2014
+		 */
 
 		private function _set_data($data){
 			$this->data = [];
@@ -85,10 +90,13 @@
 				$this->related_lists[$r] = $this->related_model->find('list');
 			}
 		}
+		/**
+		 * set the default value for a field in the database.
+		 *
+		 * Date Added: Fri, Aug 08, 2014
+		 */
 
 		private function _get_field_defaults(){
-			//{ id:null, NewsCategory:{id:1},    title:"The first title",published:0,, model:model_name, news_category_id:1, published_date : null};
-			//{"id":null,"NewsCategory":{"id":1},"title":null,"author":null,"published":null,"published_date":null,"news_category_id":1,"model":"News"}
 			$this->defaults = [];
 			foreach($this->fields as $field){
 				$field_type = $this->model->getColumnType($field);
@@ -196,7 +204,11 @@
 		 * Date Added: Tue, Jun 24, 2014
 		 */
 		private function _get_input($field_name, $contentEditable = false){
+			// If this is an associated model field get that
+
 			$field_type = $this->model->getColumnType($field_name);
+
+
 			switch($field_type){
 				case 'boolean':
 					$input = $this->_input_boolean($field_name);
@@ -217,6 +229,21 @@
 					break;
 			}
 			return $input;
+		}
+
+		/**
+		 * check to see if we are using a related field
+		 *
+		 * Date Added: Fri, Aug 08, 2014
+		 */
+
+		private function _get_related_column_type($field_name){
+			if(list($associated_model, $field) = explode('.', $field_name)){
+				return $this->model->$associated_model->getColumnType($field_name);
+			}else{
+				return null;
+			}
+
 		}
 
 
