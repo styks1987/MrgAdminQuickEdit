@@ -41,8 +41,8 @@
 					$value = $this->_parse_data_images($doc);
 				}*/
 			}
-			unset($data['Image']);
-			if($this->model->saveAll($data)){
+			//unset($data['Image']);
+			if($this->model->save($data)){
 				$data = $this->model->findById($data['id']);
 				echo json_encode($data);
 			}else{
