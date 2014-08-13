@@ -9,6 +9,9 @@ Edit.Model = Backbone.Model.extend({
 	urlRoot:'/mrg_admin_quick_edit/edits'
 });
 Edit.Collection = Backbone.Collection.extend({
+	comparator  :function(model) {
+		return model.get('id');
+	},
 	url:'/mrg_admin_quick_edit/edits',
 	model:Edit.Model
 })

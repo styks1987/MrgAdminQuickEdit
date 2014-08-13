@@ -13,8 +13,7 @@
 			App::import('Model', $model);
 			$this->model = new $model;
 			$this->model->create();
-			unset($data['Image']);
-			if($this->model->saveAll($data)){
+			if($this->model->save($data)){
 				$data['id'] = $this->model->id;
 				echo json_encode($data, JSON_NUMERIC_CHECK);
 			}else{
@@ -43,7 +42,10 @@
 			}
 			//unset($data['Image']);
 			if($this->model->save($data)){
-				$data = $this->model->findById($data['id']);
+				$new_data = $this->model->findById($data['id']);
+				$new_data = array_intersect_key($data, $new_data);
+				// We want to filter out some associations but save the other values
+				$data = array_merge($new_data, $data);
 				echo json_encode($data);
 			}else{
 				echo 0;
