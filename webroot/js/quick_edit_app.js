@@ -9,8 +9,8 @@ Edit.Model = Backbone.Model.extend({
 	urlRoot:'/mrg_admin_quick_edit/edits'
 });
 Edit.Collection = Backbone.Collection.extend({
-	comparator  :function(model) {
-		return model.get('id');
+	comparator  :function(a,b) {
+		return (parseInt(a.get('id')) > parseInt(b.get('id')))? 1 : -1;
 	},
 	url:'/mrg_admin_quick_edit/edits',
 	model:Edit.Model
