@@ -43,6 +43,10 @@ CKEDITOR.editorConfig = function( config ) {
 	config.format_tags = 'p;h2;h3;h4;div'
 	//config.allowedContent= 'p b i ul li img a ol';
 
+	config.extraPlugins = 'autogrow';
+	config.autoGrow_onStartup = true;
+	config.autoGrow_minHeight = 500;
+
 	// Make dialogs simpler.
 	//config.removeDialogTabs = 'image:advanced;link:advanced';
 };

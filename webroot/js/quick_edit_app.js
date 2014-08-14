@@ -65,7 +65,11 @@ Edit.View = Backbone.View.extend({
 				this.modal_window[field_name].content = $(e.target).find('.content');
 				modal_window = this.modal_window;
 				console.log();
-				CKEDITOR.replace($(this.modal_window[field_name].content).attr('id'));
+				CKEDITOR.replace($(this.modal_window[field_name].content).attr('id'),{
+					fullPage: true,
+					contentsCss : '/cache_css/frontend.css?theme=Piedmont'
+				});
+				console.log(CKEDITOR.getUrl('/cache_css/frontend.css?theme=Piedmont'))
 				this.modal_window[field_name].editor = CKEDITOR.instances[$(this.modal_window[field_name].content).attr('id')]
 				//raptor(this.modal_window[field_name].content).raptor({
 				//	autoEnable:true,
