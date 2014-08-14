@@ -64,89 +64,93 @@ Edit.View = Backbone.View.extend({
 			this.modal_window[field_name].on('shown.bs.modal', function (e) {
 				this.modal_window[field_name].content = $(e.target).find('.content');
 				modal_window = this.modal_window;
-				raptor(this.modal_window[field_name].content).raptor({
-					autoEnable:true,
-					plugins: {
-						fileManager: {
-							uriPublic: '/files/images',
-							uriAction: '/mrg_admin_quick_edit/edits/raptor_upload'
-						},
-						// Need to build the new version before this will work
-						tagMenu : {
-							tags: {
-								h1:'h1',
-								h2:'h2',
-								h3:'h3',
-								h4:'h4',
-								p:'paragraph'
-							}
-						},
-						//snippetMenu: {
-						//	snippets: {
-						//		'Grey Box': '<div class="grey-box"><h1>Grey Box</h1><ul><li>This is a list</li></ul></div>'
-						//	}
-						//},
-						save : {
-							plugin:'saveRest'
-						},
-						saveRest : {
-							url:'/mrg_admin_quick_edit/edits/edit',
-							data:function (html){
-								data = {
-									id: this.raptor.getElement().data('id'),
-
-									model:model_name
-								};
-								data[field_name] = html;
-								return data;
-							}
-						}
-					},
-					layouts: {
-						toolbar: {
-							uiOrder: [
-								['save', 'cancel'],
-								['tagMenu'],
-								['textBold', 'textItalic'],
-								['listOrdered', 'listUnordered'],
-								['linkCreate', 'linkRemove'],
-								['embed', /*'fileManager',*/ 'guides'],
-								['snippetMenu', 'viewSource']
-							]
-						}
-					},
-					bind : {
-						saved : function () {
-							this.modal_window[field_name].modal('hide');
-						}.bind(this),
-						cancel : function () {
-							this.modal_window[field_name].modal('hide');
-						}.bind(this)
-					}
-				});
+				console.log();
+				CKEDITOR.replace($(this.modal_window[field_name].content).attr('id'));
+				this.modal_window[field_name].editor = CKEDITOR.instances[$(this.modal_window[field_name].content).attr('id')]
+				//raptor(this.modal_window[field_name].content).raptor({
+				//	autoEnable:true,
+				//	plugins: {
+				//		fileManager: {
+				//			uriPublic: '/files/images',
+				//			uriIcon: '/files/images',
+				//			uriAction: '/mrg_admin_quick_edit/edits/raptor_upload'
+				//		},
+				//		// Need to build the new version before this will work
+				//		tagMenu : {
+				//			tags: {
+				//				h1:'h1',
+				//				h2:'h2',
+				//				h3:'h3',
+				//				h4:'h4',
+				//				p:'paragraph'
+				//			}
+				//		},
+				//		//snippetMenu: {
+				//		//	snippets: {
+				//		//		'Grey Box': '<div class="grey-box"><h1>Grey Box</h1><ul><li>This is a list</li></ul></div>'
+				//		//	}
+				//		//},
+				//		save : {
+				//			plugin:'saveRest'
+				//		},
+				//		saveRest : {
+				//			url:'/mrg_admin_quick_edit/edits/edit',
+				//			data:function (html){
+				//				data = {
+				//					id: this.raptor.getElement().data('id'),
+				//
+				//					model:model_name
+				//				};
+				//				data[field_name] = html;
+				//				return data;
+				//			}
+				//		}
+				//	},
+				//	layouts: {
+				//		toolbar: {
+				//			uiOrder: [
+				//				['save', 'cancel'],
+				//				['tagMenu'],
+				//				['textBold', 'textItalic'],
+				//				['listOrdered', 'listUnordered'],
+				//				['linkCreate', 'linkRemove'],
+				//				['embed', 'fileManager', 'guides'],
+				//				['snippetMenu', 'viewSource']
+				//			]
+				//		}
+				//	},
+				//	bind : {
+				//		saved : function () {
+				//			this.modal_window[field_name].modal('hide');
+				//		}.bind(this),
+				//		cancel : function () {
+				//			this.modal_window[field_name].modal('hide');
+				//		}.bind(this)
+				//	}
+				//});
 
 			}.bind(this));
 
 			this.modal_window[field_name].on('hide.bs.modal', function (e) {
+				if (!$(e.currentTarget).hasClass('save')) {
 
-
-				//if (!$(e.currentTarget).hasClass('save')) {
-				//	new_html = this.modal_window[field_name].content.html();
-				//	current_html = this.model.get(field_name);
-				//	if (new_html != current_html) {
-				//		if (!confirm('It looks like you have changes that need to be saved. Press OK to discard changes.')) {
-				//			e.preventDefault();
-				//		}else{
-				//			this.modal_window[field_name].content.html(current_html);
-				//		}
-				//	}
-				//}
+					new_html = this.modal_window[field_name].editor.getData();
+					current_html = this.model.get(field_name);
+					if (new_html != current_html) {
+						if (!confirm('It looks like you have changes that need to be saved. Press OK to discard changes.')) {
+							e.preventDefault();
+						}else{
+							this.modal_window[field_name].content.html(current_html);
+							this.modal_window[field_name].editor.destroy()
+						}
+					}
+				}
 			}.bind(this));
 
-			//this.modal_window[field_name].on('click', '.save', function (e) {
-			//	html = this.modal_window[field_name].content.html();
-			//	this._update_text(field_name, html);
-			//}.bind(this))
+			this.modal_window[field_name].on('click', '.save', function (e) {
+				html = this.modal_window[field_name].editor.getData();
+				this._update_text(field_name, html);
+			}.bind(this))
 		}
 
 
