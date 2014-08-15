@@ -57,8 +57,9 @@ CKEDITOR.editorConfig = function( config ) {
 	//config.removeButtons = 'Underline,Subscript,Superscript,Styles,HorizontalRule,SpecialChar';
 
 	// Se the most common block elements.
-	config.format_tags = 'p;h2;h3;h4;div'
-	config.allowedContent= 'p b i ul li img a ol script div';
+	config.format_tags = 'h2;h3;h4;div'
+	//config.allowedContent= 'p b i ul li img a ol script div';
+	config.allowContent = true;
 
 
 	config.extraPlugins = 'autogrow';
