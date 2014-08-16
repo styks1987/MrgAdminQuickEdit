@@ -32,6 +32,7 @@
 				"var model_name = '".$this->model->name."';".
 				"var model_defaults = ".json_encode($this->defaults).";".
 				"var related_lists = ".json_encode($this->related_lists).";"
+
 			);
 
 			// This has to be loaded last
@@ -93,6 +94,11 @@
 				$this->related_model = new $r();
 				$this->related_lists[$r] = $this->related_model->find('list');
 				asort($this->related_lists[$r]);
+				$list = [];
+				foreach($this->related_lists[$r] as $id=>$value){
+					$list[] = ['id'=>$id, 'value'=>$value];
+				}
+				$this->related_lists[$r] = $list;
 			}
 		}
 		/**
@@ -268,10 +274,10 @@
 			$input .= "<div class='col-sm-9' style='padding-right:0;'>";
 				$input .= "<select style='width:100%;' data-field='".Inflector::underscore($field_name)."_id' name='".Inflector::underscore($field_name)."_id'>";
 				$input .= "<option value=0>-- Choose an Option --</option>";
-				$input .= "<% _.each(lists['".$field_name."'], function (value, related_id){ %>";
+				$input .= "<% _.each(lists['".$field_name."'], function (item){ %>";
 				$input .= "<option
-								<% if(".$fkey." == related_id){%> selected='selected' <%}%>
-								value='<%= related_id %>'><%= value %></option>";
+								<% if(".$fkey." == item.id){%> selected='selected' <%}%>
+								value='<%= item.id %>'><%= item.value %></option>";
 				$input .= "<% }); %>";
 
 				$input .= "</select>";
