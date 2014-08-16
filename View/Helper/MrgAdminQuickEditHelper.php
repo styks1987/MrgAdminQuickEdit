@@ -92,6 +92,7 @@
 				App::import('Model', $r);
 				$this->related_model = new $r();
 				$this->related_lists[$r] = $this->related_model->find('list');
+				asort($this->related_lists[$r]);
 			}
 		}
 		/**
