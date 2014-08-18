@@ -41,9 +41,7 @@
 			echo $this->Html->script('MrgAdminQuickEdit.jquery.filedrop');
 			echo $this->Html->script('MrgAdminQuickEdit.jquery.hotkeys');
 			//echo $this->Html->script('MrgAdminQuickEdit.raptor.js');
-			echo $this->Html->script('MrgAdminQuickEdit.ckeditor/ckeditor.js');
-			echo $this->Html->script('MrgAdminQuickEdit.ckeditor/adapters/jquery.js');
-			echo $this->Html->script('MrgAdminQuickEdit.ckeditor/config.js');
+
 
 			echo $this->Html->script('MrgAdminQuickEdit.quick_edit_app');
 
