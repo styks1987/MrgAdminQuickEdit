@@ -148,8 +148,8 @@
 
 			$row_fields[] = $this->Html->tag('td',
 				$this->Html->link('', 'javascript:void(0)', ['class'=>'glyphicon glyphicon-picture attachment'])." | ".
-				'<a href="/'.Inflector::pluralize(Inflector::underscore($this->model->name)).'/view/<%= id %>" target="_blank" class="glyphicon glyphicon-share-alt" /></a>'. " | ".
-				'<a href="/admin/'.Inflector::pluralize(Inflector::underscore($this->model->name)).'/edit/<%= id %>" target="_blank" class="glyphicon glyphicon-pencil" /></a>'." | ".
+				'<a href="/'.Inflector::pluralize(Inflector::underscore($this->model->name)).'/view/<%= id %>" class="glyphicon glyphicon-share-alt" /></a>'. " | ".
+				'<a href="/admin/'.Inflector::pluralize(Inflector::underscore($this->model->name)).'/edit/<%= id %>" class="glyphicon glyphicon-pencil" /></a>'." | ".
 				$this->Html->link('', 'javascript:void(0)', ['class'=>'glyphicon glyphicon-trash delete']),
 				['style'=>'min-width:105px;']
 			);
@@ -189,8 +189,9 @@
 		private function _create_collection_template($template_id = 'EditViewCollectionTemplate'){
 			$table = $this->Html->row([
 				[
-					'col-sm-2 pull-right',
-					$this->Html->link('Add New', 'javascript:void(0)', ['id'=>'add_new', 'class'=>'btn btn-primary', 'style'=>'margin-bottom:20px;'])
+					'col-sm-3 pull-right',
+					$this->Html->link('Quick Add', 'javascript:void(0)', ['id'=>'add_new', 'class'=>'btn btn-primary pull-right', 'style'=>'margin-bottom:20px;']).
+					$this->Html->link('Add', '/admin/'.Inflector::underscore(Inflector::pluralize($this->model->name)).'/add', ['class'=>'btn btn-primary pull-right', 'style'=>'margin-bottom:20px; margin-right:20px;'])
 				]
 			]);
 
