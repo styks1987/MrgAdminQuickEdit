@@ -33,6 +33,9 @@
 			foreach($data as $column=>&$value){
 				if($this->model->getColumnType($column) && $this->model->getColumnType($column) != 'text'){
 					$value = strip_tags($value);
+					if($value == 'false'){
+						$value = 0;
+					}
 				}/*elseif($this->model->getColumnType($column) == 'text'){
 					$doc = new DOMDocument();
 					$doc->loadHTML($value);
